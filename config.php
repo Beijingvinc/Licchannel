@@ -3,6 +3,7 @@
 
 // Board name
 define('BOARD_TITLE', 'Licchannel');
+define('BOARD_TITLE_IMG', ''); // Vacío si no quieres imagen
 // Admin password (change after install)
 define('ADMIN_PASSWORD', 'admin123');
 // Max threads to show in index
