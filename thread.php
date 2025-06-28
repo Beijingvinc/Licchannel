@@ -73,5 +73,27 @@ $lines = file($thread_file, FILE_IGNORE_NEW_LINES);
 <div id="footer">
     <a href="index.php">&lt; <?= tr('back_to_index') ?></a>
 </div>
+
+<script>
+// Manejar correctamente Shift+Enter en textareas
+document.addEventListener('DOMContentLoaded', function() {
+    const textareas = document.querySelectorAll('textarea[name="message"]');
+    
+    textareas.forEach(function(textarea) {
+        textarea.addEventListener('keydown', function(e) {
+            // Si es Enter sin Shift, prevenir el comportamiento por defecto y enviar el formulario
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const form = this.closest('form');
+                if (form) {
+                    form.submit();
+                }
+            }
+            // Si es Shift+Enter, permitir el comportamiento normal (nueva línea)
+        });
+    });
+});
+</script>
+
 </body>
 </html> 

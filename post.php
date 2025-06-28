@@ -6,6 +6,7 @@ $action = $_POST['action'] ?? '';
 $name = trim($_POST['name'] ?? '');
 if ($name === '') $name = DEFAULT_USERNAME;
 $message = trim($_POST['message'] ?? '');
+$message = str_replace("\n", "\\n", $message);
 $date = date('Y-m-d H:i:s');
 
 if ($action === 'newthread') {

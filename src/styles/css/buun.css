@@ -47,8 +47,23 @@ ol p:last-child, ul p:last-child {
 }
 .aa {
 	font-family: Mona,'MS PGothic' !important; 
+	line-height: 1.0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
 }
 
+/* Estilos específicos para ASCII art dentro de replytext */
+.replytext .aa {
+	line-height: 1.0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+/* Reducir el line-height para todo el replytext para mejor compatibilidad con ASCII art */
+.replytext {
+	margin: 0.5em 0em 0em 3em;
+	line-height: 1.2;
+}
 
 .outerbox {
 	background: #CCFFCC;

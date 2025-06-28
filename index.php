@@ -28,7 +28,8 @@ function get_thread_count($file) {
     $lines = file(DATA_DIR . '/' . $file);
     return count($lines);
 }
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -39,7 +40,13 @@ function get_thread_count($file) {
 <body class="mainpage">
 
 <div id="titlebox" class="outerbox"><div class="innerbox">
-    <h1><?= BOARD_TITLE ?></h1>
+    <?php
+    if (preg_match('/\.(jpg|jpeg|png|gif|bmp|webp)$/i', BOARD_TITLE_IMG)) {
+        echo '<img src="' . htmlspecialchars(BOARD_TITLE_IMG) . '" alt="Board Title" style="max-width:100%;height:auto;">';
+    } else {
+        echo '<h1>' . htmlspecialchars(BOARD_TITLE_IMG) . '</h1>';
+    }
+    ?>
     <div class="threadnavigation">
         <a href="#menu" title="Jump to thread list">■</a>
         <a href="#1" title="Jump to next thread">▼</a>
@@ -146,6 +153,27 @@ function get_thread_count($file) {
     &nbsp;-&nbsp;
     &nbsp;-&nbsp; <a href="https://github.com/Strangeman2222/Licchannel">Licchannel</a>
 </div>
+
+<script>
+// Manejar correctamente Shift+Enter en textareas
+document.addEventListener('DOMContentLoaded', function() {
+    const textareas = document.querySelectorAll('textarea[name="message"]');
+    
+    textareas.forEach(function(textarea) {
+        textarea.addEventListener('keydown', function(e) {
+            // Si es Enter sin Shift, prevenir el comportamiento por defecto y enviar el formulario
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const form = this.closest('form');
+                if (form) {
+                    form.submit();
+                }
+            }
+            // Si es Shift+Enter, permitir el comportamiento normal (nueva línea)
+        });
+    });
+});
+</script>
 
 </body>
 </html> 
