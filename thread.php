@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'bbcode.php';
+session_start(); 
 
 // Style selector
 $style = $_COOKIE['style'] ?? DEFAULT_STYLE;
@@ -17,7 +18,13 @@ if (!file_exists($thread_file)) {
 }
 $lines = file($thread_file, FILE_IGNORE_NEW_LINES);
 
-?><!DOCTYPE html>
+
+$captcha_a = rand(1, 10);
+$captcha_b = rand(1, 10);
+$_SESSION['captcha_answer'] = $captcha_a + $captcha_b;
+?>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -61,39 +68,37 @@ $lines = file($thread_file, FILE_IGNORE_NEW_LINES);
         </div>
     </div>
     <?php endforeach; ?>
+
     <form action="post.php" method="post">
         <input type="hidden" name="action" value="reply">
         <input type="hidden" name="id" value="<?= htmlspecialchars($id) ?>">
-        <label>Name: <input type="text" name="name" maxlength="30"></label>
+        <label>Name: <input type="text" name="name" maxlength="30"></label><br>
         <label><?= tr('message') ?>:<br>
         <textarea name="message" rows="4" cols="50" required></textarea></label><br>
+        <!-- Captcha -->
+        <label>Solve: <?= $captcha_a ?> + <?= $captcha_b ?> = <input type="text" name="captcha" required></label><br>
         <input type="submit" value="<?= tr('reply') ?>">
     </form>
 </div>
+
 <div id="footer">
     <a href="index.php">&lt; <?= tr('back_to_index') ?></a>
 </div>
 
 <script>
-// Manejar correctamente Shift+Enter en textareas
+
 document.addEventListener('DOMContentLoaded', function() {
     const textareas = document.querySelectorAll('textarea[name="message"]');
-    
     textareas.forEach(function(textarea) {
         textarea.addEventListener('keydown', function(e) {
-            // Si es Enter sin Shift, prevenir el comportamiento por defecto y enviar el formulario
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 const form = this.closest('form');
-                if (form) {
-                    form.submit();
-                }
+                if (form) form.submit();
             }
-            // Si es Shift+Enter, permitir el comportamiento normal (nueva línea)
         });
     });
 });
 </script>
-
 </body>
-</html> 
+</html>

@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'bbcode.php';
+session_start(); 
 
 // Style selector
 $style = $_COOKIE['style'] ?? DEFAULT_STYLE;
@@ -28,6 +29,11 @@ function get_thread_count($file) {
     $lines = file(DATA_DIR . '/' . $file);
     return count($lines);
 }
+
+
+$num1 = rand(1, 9);
+$num2 = rand(1, 9);
+$_SESSION['captcha_answer'] = $num1 + $num2;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -123,6 +129,12 @@ function get_thread_count($file) {
                 <tr><td>Name:</td><td><input type="text" name="name" size="19" maxlength="100"></td>
                     <td><input type="submit" value="<?= tr('reply') ?>"></td></tr>
                 <tr><td></td><td colspan="2"><textarea name="message" cols="64" rows="5"></textarea></td></tr>
+                <tr><td>Captcha:</td>
+                    <td colspan="2">
+                        ¿How much is <?= $num1 ?> + <?= $num2 ?>? 
+                        <input type="text" name="captcha" required>
+                    </td>
+                </tr>
             </tbody></table>
         </form>
         <div class="threadlinks">
@@ -144,36 +156,38 @@ function get_thread_count($file) {
                 <td><input type="submit" value="<?= tr('create_new_thread') ?>"></td></tr>
             <tr><td>Name:</td><td colspan="2"><input type="text" name="name" size="19" maxlength="100"></td></tr>
             <tr><td></td><td colspan="2"><textarea name="message" cols="64" rows="5"></textarea></td></tr>
+            <tr><td>Captcha:</td>
+                <td colspan="2">
+                    ¿How much is <?= $num1 ?> + <?= $num2 ?>? 
+                    <input type="text" name="captcha" required>
+                </td>
+            </tr>
         </tbody></table>
     </form>
 </div></div>
 
 <div id="footer">
-    <a href="/"><?= tr('footer_channel') ?></a>
+    <a href="/"></a>
     &nbsp;-&nbsp;
-    &nbsp;-&nbsp; <a href="https://github.com/Strangeman2222/Licchannel">Licchannel</a>
+    &nbsp;-&nbsp; <a href="https://github.com/Strangeman2222/Licchannel">Licchannel 1.2</a>
 </div>
 
 <script>
-// Manejar correctamente Shift+Enter en textareas
+
 document.addEventListener('DOMContentLoaded', function() {
     const textareas = document.querySelectorAll('textarea[name="message"]');
     
     textareas.forEach(function(textarea) {
         textarea.addEventListener('keydown', function(e) {
-            // Si es Enter sin Shift, prevenir el comportamiento por defecto y enviar el formulario
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 const form = this.closest('form');
-                if (form) {
-                    form.submit();
-                }
+                if (form) form.submit();
             }
-            // Si es Shift+Enter, permitir el comportamiento normal (nueva línea)
         });
     });
 });
 </script>
 
 </body>
-</html> 
+</html>
