@@ -14,7 +14,12 @@ $css = $STYLES[$style] ?? reset($STYLES);
 // Get thread list
 $threads = array_diff(scandir(DATA_DIR), array('.', '..'));
 $threads = array_filter($threads, function($f) { return preg_match('/^thread_\d+\.dat$/', $f); });
-rsort($threads);
+
+// BUMP
+usort($threads, function($a, $b) {
+    return filemtime(DATA_DIR . '/' . $b) - filemtime(DATA_DIR . '/' . $a);
+});
+
 $threads = array_slice($threads, 0, MAX_THREADS);
 
 function get_thread_title($file) {
@@ -29,7 +34,6 @@ function get_thread_count($file) {
     $lines = file(DATA_DIR . '/' . $file);
     return count($lines);
 }
-
 
 $num1 = rand(1, 9);
 $num2 = rand(1, 9);
@@ -95,6 +99,11 @@ $_SESSION['captcha_answer'] = $num1 + $num2;
     $lines = file(DATA_DIR . '/' . $thread, FILE_IGNORE_NEW_LINES);
     $title = get_thread_title($thread);
     $count = count($lines);
+
+    
+    $max_preview = 5;
+    $total = count($lines);
+    $start = max(0, $total - $max_preview);
 ?>
     <a name="<?= $n ?>"></a>
     <div class="thread">
@@ -104,9 +113,17 @@ $_SESSION['captcha_answer'] = $num1 + $num2;
             <a href="#<?= $n-1 ?>" title="Jump to previous thread">▲</a>
             <a href="#<?= $n+1 ?>" title="Jump to next thread">▼</a>
         </div>
+
         <div class="replies">
             <div class="allreplies">
-                <?php foreach ($lines as $num => $line):
+
+                <?php if ($total > $max_preview): ?>
+                    <div class="replyabbrev">
+                        Posts omitted: <?= $total - $max_preview ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php foreach (array_slice($lines, $start) as $num => $line):
                     $parts = explode("\t", $line);
                     $name = htmlspecialchars($parts[1] ?? DEFAULT_USERNAME);
                     $message = bbcode_to_html($parts[3] ?? '');
@@ -114,7 +131,11 @@ $_SESSION['captcha_answer'] = $num1 + $num2;
                 ?>
                 <div class="reply">
                     <h3>
-                        <span class="replynum"><a title="Quote post number in reply" href="javascript:void(0);"><?= $num+1 ?></a></span>
+                        <span class="replynum">
+                            <a title="Quote post number in reply" href="javascript:void(0);">
+                                <?= $start + $num + 1 ?>
+                            </a>
+                        </span>
                         Name: <span class="postername"><?= $name ?></span> : <?= $date ?>
                     </h3>
                     <div class="replytext"><?= $message ?></div>
@@ -122,6 +143,7 @@ $_SESSION['captcha_answer'] = $num1 + $num2;
                 <?php endforeach; ?>
             </div>
         </div>
+
         <form action="post.php" method="post">
             <input type="hidden" name="action" value="reply">
             <input type="hidden" name="id" value="<?= htmlspecialchars($id) ?>">
@@ -131,12 +153,13 @@ $_SESSION['captcha_answer'] = $num1 + $num2;
                 <tr><td></td><td colspan="2"><textarea name="message" cols="64" rows="5"></textarea></td></tr>
                 <tr><td>Captcha:</td>
                     <td colspan="2">
-                        ¿How much is <?= $num1 ?> + <?= $num2 ?>? 
+                        How much is <?= $num1 ?> + <?= $num2 ?>? 
                         <input type="text" name="captcha" required>
                     </td>
                 </tr>
             </tbody></table>
         </form>
+
         <div class="threadlinks">
             <a href="thread.php?id=<?= urlencode($id) ?>"><?= tr('entire_thread') ?></a>
             <a href="thread.php?id=<?= urlencode($id) ?>"><?= tr('last_50_posts') ?></a>
@@ -158,7 +181,7 @@ $_SESSION['captcha_answer'] = $num1 + $num2;
             <tr><td></td><td colspan="2"><textarea name="message" cols="64" rows="5"></textarea></td></tr>
             <tr><td>Captcha:</td>
                 <td colspan="2">
-                    ¿How much is <?= $num1 ?> + <?= $num2 ?>? 
+                    How much is <?= $num1 ?> + <?= $num2 ?>? 
                     <input type="text" name="captcha" required>
                 </td>
             </tr>
@@ -173,7 +196,6 @@ $_SESSION['captcha_answer'] = $num1 + $num2;
 </div>
 
 <script>
-
 document.addEventListener('DOMContentLoaded', function() {
     const textareas = document.querySelectorAll('textarea[name="message"]');
     
